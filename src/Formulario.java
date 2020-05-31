@@ -13,11 +13,8 @@ public class Formulario extends JFrame implements ActionListener {
 
     private JButton btnBuscarArchivo;
     private JButton btnCrearArchivo;
-
-    private File archivo;
     private File ruta;
-    // private PanelNuevoArchivo panel1;
-    private PanelMedia panel2;
+    private PanelMedia panel;
 
     private Double[][] matriz;
 
@@ -26,14 +23,9 @@ public class Formulario extends JFrame implements ActionListener {
         setTitle("Ejercicio 5");
         setLayout(new BorderLayout(20, 20));
 
-        // panel1 = new PanelNuevoArchivo();
-        // panel1.setBounds(50, 50, 1200, 1200);
-        // add(panel1, BorderLayout.NORTH);
-        // panel1.setVisible(false);
-
-        panel2 = new PanelMedia();
-        panel2.setVisible(false);
-        add(panel2, BorderLayout.CENTER);
+        panel = new PanelMedia();
+        panel.setVisible(false);
+        add(panel, BorderLayout.CENTER);
 
         JPanel botones = new JPanel();
         botones.setLayout(new FlowLayout());
@@ -59,8 +51,8 @@ public class Formulario extends JFrame implements ActionListener {
         JFileChooser fc;
         if (e.getSource() == btnBuscarArchivo) {
             // panel1.setVisible(false);
-            panel2.setVisible(true);
-            if (panel2.isVisible()) {
+            panel.setVisible(true);
+            if (panel.isVisible()) {
 
                 FileNameExtensionFilter texto = new FileNameExtensionFilter("texto", "txt");
 
@@ -73,27 +65,29 @@ public class Formulario extends JFrame implements ActionListener {
 
                 if (respuesta == JFileChooser.APPROVE_OPTION) {
 
-                    archivo = fc.getSelectedFile();
-                    matriz = extraerMatrizDeNum();
-                    if (fc.getFileFilter() == texto) {
+                    ruta = fc.getSelectedFile();
+                    if (extraerMatrizDeNum()) {
 
-                        try {
-                            comprobarPrimeraFila(matriz);
-                        } catch (ExcepcionEntero er) {
-                            // TODO Auto-generated catch block
-                            panel2.setError(er.getMessage());
+                        if (fc.getFileFilter() == texto) {
 
-                            for (int i = 0; i < matriz.length; i++) {
-                                matriz[i][0] = (double) 0;
+                            try {
+                                comprobarPrimeraFila(matriz);
+                            } catch (ExcepcionEntero er) {
+                                // TODO Auto-generated catch block
+                                panel.setError(er.getMessage());
+
+                                for (int i = 0; i < matriz.length; i++) {
+                                    matriz[i][0] = (double) 0;
+                                }
                             }
+                            panel.setMediaText1(media(matriz, 0) + "");
+                            panel.setMediaText2(media(matriz, 1) + "");
+                            panel.setMediaText3(media(matriz, 2) + "");
+
+                        } else {
+                            JOptionPane.showMessageDialog(null,
+                                    "El archivo que desea abrir no coincide con el formato permitido");
                         }
-                        panel2.setMediaText1(media(matriz, 0) + "");
-                        panel2.setMediaText2(media(matriz, 1) + "");
-                        panel2.setMediaText3(media(matriz, 2) + "");
-                        
-                    } else {
-                        JOptionPane.showMessageDialog(null,
-                                "El archivo que desea abrir no coincide con el formato permitido");
                     }
                 }
             }
@@ -101,42 +95,22 @@ public class Formulario extends JFrame implements ActionListener {
 
         if (e.getSource() == btnCrearArchivo) {
 
-            // if (panel1.isVisible()) {
             int n;
-            // crearArchivo(ruta);
-            // try {
-            // n = panel1.getCantFilas();
-            // generarMatriz(n);
-            // } catch (NumberFormatException er) {
-            // panel1.mostrarError("Solo se pueden ingresar números");
-            // }
-            // 
-            // } else {
             fc = new JFileChooser();
-            
-            // fc.setCurrentDirectory(new java.io.File("."));
-            // fc.setDialogTitle("Crear nuevo archivo");
-            // fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            // fc.setAcceptAllFileFilterUsed(false);
 
             if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 
                 ruta = fc.getSelectedFile();
-
-                
                 System.err.println(ruta);
                 FormularioGenerarMatriz f = new FormularioGenerarMatriz(this);
                 f.pack();
                 f.setVisible(true);
                 f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 n = f.cantidadFilas();
-                generarMatriz(n);
-                escribirArchivo();
-                // panel1.setVisible(true);
-                // panel2.setVisible(false);
-                // System.err.println(fc.getSelectedFile());
-                // System.err.println(archivo.getName());
-                // }
+                if (n != 0) {
+                    generarMatriz(n);
+                    escribirArchivo();
+                }
             }
 
         }
@@ -148,7 +122,7 @@ public class Formulario extends JFrame implements ActionListener {
      */
     public void escribirArchivo() {
         try {
-            PrintWriter escritura = new PrintWriter(new FileWriter(ruta+".txt"), true);
+            PrintWriter escritura = new PrintWriter(new FileWriter(ruta + ".txt", true));
             for (Double[] valores : matriz) {
                 String texto = "";
                 for (int i = 0; i < valores.length; i++) {
@@ -169,23 +143,8 @@ public class Formulario extends JFrame implements ActionListener {
     }
 
     /**
-     * Crea un archivo txt en la ruta seleccionada
-     * @param ruta ruta
-     */
-    // public void crearArchivo(File ruta) {
-    //     String nombreArchivo = panel1.getNombreArchivo();
-
-    //     archivo = new File(ruta.getPath() + File.separator + nombreArchivo + ".txt");
-    //     try {
-    //         archivo.createNewFile();
-    //     } catch (IOException e) {
-    //         // TODO Auto-generated catch block
-    //         e.printStackTrace();
-    //     }
-    // }
-
-    /**
      * Genera matriz según la cantidad de filas que desea el usuario
+     * 
      * @param n cantidad de filas
      */
     public void generarMatriz(int n) {
@@ -198,16 +157,17 @@ public class Formulario extends JFrame implements ActionListener {
         }
 
         // for (int i = 0; i < matriz.length; i++) {
-        //     System.out.println();
-        //     for (int j = 0; j < matriz[i].length; j++) {
-        //         System.out.print(matriz[i][j] + " ");
+        // System.out.println();
+        // for (int j = 0; j < matriz[i].length; j++) {
+        // System.out.print(matriz[i][j] + " ");
 
-        //     }
+        // }
         // }
     }
 
     /**
      * Comprueba si la primera fila son números enteros
+     * 
      * @param matriz matriz
      * @throws ExcepcionEntero excepción de números enteros
      */
@@ -221,15 +181,27 @@ public class Formulario extends JFrame implements ActionListener {
 
     /**
      * Separa el contenido del archivo en una matriz de n filas por 3 columnas
+     * 
      * @return matriz
      */
 
-    private Double[][] extraerMatrizDeNum() {
+    private Boolean extraerMatrizDeNum() {
+        panel.setMediaText1("");
+        panel.setMediaText2("");
+        panel.setMediaText3("");
         String textoArchivo = leerArchivo();
+        Boolean matrizCreada = true;
         // System.err.println(textoArchivo);
         String[] elementos = textoArchivo.split(",");
 
-        Double[][] matriz = new Double[elementos.length / 3][3];
+        for (String elemento : elementos) {
+            if (!elemento.matches("[\\d.]+")) {
+                matrizCreada = false;
+                panel.setError("El archivo contiene texto");
+            }
+        }
+
+        matriz = new Double[elementos.length / 3][3];
         int k = 0;
         for (int i = 0; i < matriz.length; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
@@ -237,11 +209,12 @@ public class Formulario extends JFrame implements ActionListener {
                     matriz[i][j] = Double.parseDouble(elementos[k]);
                     k++;
                 } catch (NumberFormatException er) {
-                    panel2.setError("El archivo contiene texto");
+                    panel.setError("El archivo contiene texto");
                 }
             }
         }
-        return matriz;
+        System.err.println(matrizCreada);
+        return matrizCreada;
     }
 
     /**
@@ -251,7 +224,7 @@ public class Formulario extends JFrame implements ActionListener {
      */
     public String leerArchivo() {
         String txt = "";
-        try (Scanner sc = new Scanner(archivo)) {
+        try (Scanner sc = new Scanner(ruta)) {
             while (sc.hasNext()) {
                 txt += sc.nextLine() + ",";
             }
@@ -263,6 +236,7 @@ public class Formulario extends JFrame implements ActionListener {
 
     /**
      * Calcula la media de una columna
+     * 
      * @param matriz matriz de números
      * @param a      número de columna
      * @return media
