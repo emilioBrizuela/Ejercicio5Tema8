@@ -4,12 +4,12 @@ import java.awt.*;
 public class PanelMedia extends JPanel {
 
     private String[] tMedia = { "MEDIA 1", "MEDIA 2", "MEDIA 3" };
-    private JTextField mediaText1;
-    private JTextField mediaText2;
-    private JTextField mediaText3;
+    private JTextField txfMedia1;
+    private JTextField txfMedia2;
+    private JTextField txfMedia3;
 
-    private JLabel error;
-    private JLabel medias;
+    private JLabel lblError;
+    private JLabel lblMedia;
 
     public PanelMedia() {
 
@@ -17,36 +17,36 @@ public class PanelMedia extends JPanel {
         int y = 0;
 
         for (String titulo : tMedia) {
-            medias = new JLabel();
-            medias.setBounds(100, y, 200, 20);
-            medias.setText(titulo);
-            add(medias);
+            lblMedia = new JLabel();
+            lblMedia.setBounds(100, y, 200, 20);
+            lblMedia.setText(titulo);
+            add(lblMedia);
             y += 30;
         }
 
-        mediaText1 = new JTextField();
-        mediaText2 = new JTextField();
-        mediaText3 = new JTextField();
+        txfMedia1 = new JTextField();
+        txfMedia2 = new JTextField();
+        txfMedia3 = new JTextField();
 
-        mediaText1.setBounds(200, 0, 200, 20);
-        mediaText2.setBounds(200, 30, 200, 20);
-        mediaText3.setBounds(200, 60, 200, 20);
+        txfMedia1.setBounds(200, 0, 200, 20);
+        txfMedia2.setBounds(200, 30, 200, 20);
+        txfMedia3.setBounds(200, 60, 200, 20);
 
-        mediaText1.setToolTipText("Media primera fila, si no contiene números enteros redondeará el resultado");
-        mediaText2.setToolTipText("Media segunda fila, muestra valor en reales ");
-        mediaText3.setToolTipText("Media tercera fila, muestra valor en reales");
+        txfMedia1.setToolTipText("Media primera fila, si no contiene números enteros redondeará el resultado");
+        txfMedia2.setToolTipText("Media segunda fila, muestra valor en reales ");
+        txfMedia3.setToolTipText("Media tercera fila, muestra valor en reales");
 
-        add(mediaText1);
-        add(mediaText2);
-        add(mediaText3);
+        add(txfMedia1);
+        add(txfMedia2);
+        add(txfMedia3);
 
-        mediaText1.setEditable(false);
-        mediaText2.setEditable(false);
-        mediaText3.setEditable(false);
+        txfMedia1.setEditable(false);
+        txfMedia2.setEditable(false);
+        txfMedia3.setEditable(false);
 
-        error = new JLabel("Los archivos deben contener números, el formato es: Entero, Reales, Reales");
-        error.setBounds(50, 100, 500, 20);
-        add(error);
+        lblError = new JLabel("Los archivos deben contener números, el formato es: Entero, Reales, Reales");
+        lblError.setBounds(50, 100, 500, 20);
+        add(lblError);
     }
 
     /**
@@ -55,8 +55,12 @@ public class PanelMedia extends JPanel {
      * @param t Texto del error
      */
     public void setError(String t) {
-        error.setForeground(Color.RED);
-        this.error.setText(t);
+        lblError.setForeground(Color.RED);
+        this.lblError.setText(t);
+    }
+
+    public JLabel getLblError(){
+        return this.lblError;
     }
 
     /**
@@ -64,8 +68,8 @@ public class PanelMedia extends JPanel {
      * 
      * @param t media
      */
-    public void setMediaText1(String t) {
-        this.mediaText1.setText(t);
+    public void setTxfMedia1(String t) {
+        this.txfMedia1.setText(t);
     }
 
     /**
@@ -74,8 +78,8 @@ public class PanelMedia extends JPanel {
      * @param t media
      */
 
-    public void setMediaText2(String t) {
-        this.mediaText2.setText(t);
+    public void setTxfMedia2(String t) {
+        this.txfMedia2.setText(t);
     }
 
     /**
@@ -83,7 +87,7 @@ public class PanelMedia extends JPanel {
      * 
      * @param t media
      */
-    public void setMediaText3(String t) {
-        this.mediaText3.setText(t);
+    public void setTxfMedia3(String t) {
+        this.txfMedia3.setText(t);
     }
 }

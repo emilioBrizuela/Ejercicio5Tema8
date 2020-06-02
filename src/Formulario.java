@@ -3,10 +3,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Formulario extends JFrame implements ActionListener {
@@ -64,31 +68,35 @@ public class Formulario extends JFrame implements ActionListener {
                 respuesta = fc.showOpenDialog(this);
 
                 if (respuesta == JFileChooser.APPROVE_OPTION) {
-
+                    // NO REINICIA LOS DATOS! REVISAR
+                    panel.setError("Los archivos deben contener números, el formato es: Entero, Reales, Reales");
+                    panel.getLblError().setForeground(Color.black);
+                    panel.setTxfMedia1("");
+                    panel.setTxfMedia2("");
+                    panel.setTxfMedia3("");
                     ruta = fc.getSelectedFile();
-                    if (extraerMatrizDeNum()) {
+                    leerArchivo();
 
-                        if (fc.getFileFilter() == texto) {
+                    // if (extraerMatrizDeNum()) {
 
-                            try {
-                                comprobarPrimeraFila(matriz);
-                            } catch (ExcepcionEntero er) {
-                                // TODO Auto-generated catch block
-                                panel.setError(er.getMessage());
+                    // if (fc.getFileFilter() == texto) {
 
-                                for (int i = 0; i < matriz.length; i++) {
-                                    matriz[i][0] = (double) 0;
-                                }
-                            }
-                            panel.setMediaText1(media(matriz, 0) + "");
-                            panel.setMediaText2(media(matriz, 1) + "");
-                            panel.setMediaText3(media(matriz, 2) + "");
+                    // try {
+                    // comprobarPrimeraFila(matriz);
+                    // } catch (ExcepcionEntero er) {
+                    // // TODO Auto-generated catch block
+                    // panel.setError(er.getMessage());
 
-                        } else {
-                            JOptionPane.showMessageDialog(null,
-                                    "El archivo que desea abrir no coincide con el formato permitido");
-                        }
-                    }
+                    // for (int i = 0; i < matriz.length; i++) {
+                    // matriz[i][0] = (double) 0;
+                    // }
+                    // }
+
+                    // } else {
+                    // JOptionPane.showMessageDialog(null,
+                    // "El archivo que desea abrir no coincide con el formato permitido");
+                    // }
+                    // }
                 }
             }
         }
@@ -155,14 +163,6 @@ public class Formulario extends JFrame implements ActionListener {
             matriz[i][1] = (Math.random() * 1000);
             matriz[i][2] = (Math.random() * 9900) + 100;
         }
-
-        // for (int i = 0; i < matriz.length; i++) {
-        // System.out.println();
-        // for (int j = 0; j < matriz[i].length; j++) {
-        // System.out.print(matriz[i][j] + " ");
-
-        // }
-        // }
     }
 
     /**
@@ -171,67 +171,130 @@ public class Formulario extends JFrame implements ActionListener {
      * @param matriz matriz
      * @throws ExcepcionEntero excepción de números enteros
      */
-    public void comprobarPrimeraFila(Double[][] matriz) throws ExcepcionEntero {
-        for (int i = 0; i < matriz.length; i++) {
-            if (matriz[i][0] % 1 != 0) {
+    public void comprobarPrimeraFila(ArrayList<Double[]> array) throws ExcepcionEntero {
+        for (int i = 0; i < array.size(); i++) {
+            if (array.get(i)[0] % 1 != 0) {
                 throw new ExcepcionEntero("La primera fila deben ser números ENTEROS");
             }
         }
     }
-
+    // #region 1
     /**
      * Separa el contenido del archivo en una matriz de n filas por 3 columnas
      * 
      * @return matriz
      */
 
-    private Boolean extraerMatrizDeNum() {
-        panel.setMediaText1("");
-        panel.setMediaText2("");
-        panel.setMediaText3("");
-        String textoArchivo = leerArchivo();
-        Boolean matrizCreada = true;
-        // System.err.println(textoArchivo);
-        String[] elementos = textoArchivo.split(",");
+    // private Boolean extraerMatrizDeNum() {
+    // panel.setMediaText1("");
+    // panel.setMediaText2("");
+    // panel.setMediaText3("");
+    // String textoArchivo = leerArchivo();
+    // Boolean matrizCreada = true;
+    // System.err.println(textoArchivo);
 
-        for (String elemento : elementos) {
-            if (!elemento.matches("[\\d.]+")) {
-                matrizCreada = false;
-                panel.setError("El archivo contiene texto");
-            }
-        }
+    // String[] elementos = textoArchivo.split(",");
 
-        matriz = new Double[elementos.length / 3][3];
-        int k = 0;
-        for (int i = 0; i < matriz.length; i++) {
-            for (int j = 0; j < matriz[i].length; j++) {
-                try {
-                    matriz[i][j] = Double.parseDouble(elementos[k]);
-                    k++;
-                } catch (NumberFormatException er) {
-                    panel.setError("El archivo contiene texto");
-                }
-            }
-        }
-        System.err.println(matrizCreada);
-        return matrizCreada;
-    }
+    // for (String elemento : elementos) {
+    // if (!elemento.matches("[\\d.]+")) {
+    // matrizCreada = false;
+    // panel.setError("El archivo contiene texto");
+    // }
+    // }
 
+    // matriz = new Double[elementos.length / 3][3];
+    // int k = 0;
+    // for (int i = 0; i < matriz.length; i++) {
+    // for (int j = 0; j < matriz[i].length; j++) {
+    // try {
+    // matriz[i][j] = Double.parseDouble(elementos[k]);
+    // k++;
+    // } catch (NumberFormatException er) {
+    // panel.setError("El archivo contiene texto");
+    // }
+    // }
+    // }
+    // System.err.println(matrizCreada);
+    // return matrizCreada;
+    // }
+    // #endregion 1
     /**
      * Lee el contenido del archivo
      * 
      * @return contenido del archivo
      */
-    public String leerArchivo() {
+    public void leerArchivo() {
+
+        // PROBELMA EN LAS MATRICES
         String txt = "";
-        try (Scanner sc = new Scanner(ruta)) {
-            while (sc.hasNext()) {
-                txt += sc.nextLine() + ",";
+        BufferedReader br = null;
+        ArrayList<Double[]> array = new ArrayList<>();
+        try {
+            br = new BufferedReader(new FileReader(ruta));
+            while ((txt = br.readLine()) != null) {
+                Double[] arrayDatos = new Double[3];
+                String[] datos = txt.split(",");
+
+                System.err.println(datos.length);
+
+                int i = 0;
+                for (String dato : datos) {
+
+                    if (dato.matches("[\\d.]+")) {
+                        arrayDatos[i] = Double.parseDouble(dato);
+
+                    } else {
+                        JOptionPane.showMessageDialog(null, "El archivo contiene texto", "Error texto",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+
+                    i++;
+                }
+                for (int j = 0; j < arrayDatos.length; j++) {
+                    if (arrayDatos[j] == null) {
+                        arrayDatos[j] = (double) 0;
+                        panel.setError("Error de formato: Entero , Real , Real");
+                    }
+                    System.err.println("array" + j + " " + arrayDatos[j]);
+
+                }
+
+                array.add(arrayDatos);
             }
+            try {
+                comprobarPrimeraFila(array);
+            } catch (ExcepcionEntero e) {
+                // TODO: handle exception
+                JOptionPane.showMessageDialog(null,e.getMessage(), "Error primera fila",
+                            JOptionPane.ERROR_MESSAGE);
+            }
+
+            panel.setTxfMedia1(media(array, 0));
+            panel.setTxfMedia2(media(array, 1));
+            panel.setTxfMedia3(media(array, 2));
+        } catch (
+
+        FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
-            System.err.println("Error de acceso al archivo: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return txt;
+        // try (Scanner sc = new Scanner(ruta)) {
+        // while (sc.hasNext()) {
+        // txt += sc.nextLine() + ",";
+        // }
+        // } catch (IOException e) {
+        // System.err.println("Error de acceso al archivo: " + e.getMessage());
+        // }
+        // return txt;
     }
 
     /**
@@ -242,11 +305,13 @@ public class Formulario extends JFrame implements ActionListener {
      * @return media
      */
 
-    public double media(Double[][] matriz, int a) {
+    public String media(ArrayList<Double[]> array, int a) {
         double n = 0;
-        for (int i = 0; i < matriz.length; i++) {
-            n += matriz[i][a];
+        for (int i = 0; i < array.size(); i++) {
+            Double[] matriz = array.get(i);
+            // System.err.println(matriz[a]);
+            n += array.get(i)[a];
         }
-        return n / matriz.length;
+        return String.format("%.2f", n / array.size());
     }
 }
